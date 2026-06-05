@@ -57,10 +57,12 @@ def _stream_similarity_comment(text_a: str, text_b: str, cos: float, euc: float,
         f"Computed metrics:\n"
         f"  • Cosine Similarity : {cos:.4f}  (range −1→1, higher = more similar)\n"
         f"  • Euclidean Distance: {euc:.4f}  (range 0→∞, lower = more similar)\n\n"
-        "In 3–5 sentences explain:\n"
-        "1. Whether these texts are semantically similar or different based on the scores.\n"
-        "2. Why the embedder gave these scores (what semantic relationship exists?).\n"
-        "3. Any interesting observation — e.g. cross-language gaps, domain term mismatch, surprising results."
+        "Please respond in exactly this structure:\n"
+        "**Expected:** In one sentence, state what similarity score a human expert would expect "
+        "for these two texts based purely on their meaning (e.g. 'high ~0.8', 'moderate ~0.5', 'low ~0.1').\n"
+        "**Actual:** Restate the computed cosine similarity and whether it is high / moderate / low.\n"
+        "**Difference:** Explain the gap (or agreement) between expected and actual — "
+        "e.g. cross-language encoding issues, domain jargon, paraphrase vs. synonym, embedder limitations."
     )
     with client.messages.stream(
         model="claude-opus-4-8",
@@ -85,10 +87,13 @@ def _stream_search_comment(query: str, results: list[dict], embedder_name: str):
         f"Embedder: {embedder_name}\n"
         f"Query: {query}\n\n"
         f"Top retrieved chunks:\n{top_snippets}\n\n"
-        "In 3–5 sentences explain:\n"
-        "1. How well do the retrieved chunks answer the query?\n"
-        "2. What do the similarity scores tell us about retrieval quality?\n"
-        "3. Any suggestions to improve retrieval (chunking strategy, embedder choice, etc.)."
+        "Please respond in exactly this structure:\n"
+        "**Expected:** In one sentence, describe what ideal chunks for this query should contain "
+        "(the information a perfect retriever would surface).\n"
+        "**Actual:** In one sentence, assess whether the retrieved chunks match that expectation "
+        "and note the score range (e.g. 'scores 0.45–0.61 indicate moderate confidence').\n"
+        "**Difference:** Explain the gap (or agreement) — e.g. wrong chunking granularity, "
+        "embedder language mismatch, query too vague, or genuinely good retrieval."
     )
     with client.messages.stream(
         model="claude-opus-4-8",
