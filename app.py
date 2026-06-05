@@ -10,6 +10,9 @@ import random
 from pathlib import Path
 
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
 
 try:
     import anthropic as _anthropic
