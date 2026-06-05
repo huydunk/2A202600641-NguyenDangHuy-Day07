@@ -1,8 +1,8 @@
 # Báo Cáo Lab 7: Embedding & Vector Store
 
-**Họ tên:** [Tên sinh viên]
-**Nhóm:** [Tên nhóm]
-**Ngày:** [Ngày nộp]
+**Họ tên:** Nguyễn Đăng Huy — MSSV: 2A202600641
+**Nhóm:** Nhóm 2
+**Ngày:** 05/06/2026
 
 ---
 
@@ -244,13 +244,13 @@ Tổng số chunks: 351 | Avg length: 304 chars
 ## 7. What I Learned (5 điểm — Demo)
 
 **Điều hay nhất tôi học được từ thành viên khác trong nhóm:**
-> *Viết 2-3 câu:*
+> Thành viên dùng SentenceChunker chỉ ra rằng với tài liệu tiếng Việt, ranh giới câu không phải lúc nào cũng là dấu chấm — dấu chấm xuống dòng (`.\n`) và dấu chấm trong số thập phân (`3.0`) có thể gây split nhầm. Điều này khiến tôi hiểu rõ hơn tại sao RecursiveChunker với separator `\n\n` lại ổn định hơn trên tài liệu kỹ thuật có nhiều bullet point và danh sách số thứ tự. Tôi cũng học được cách đo retrieval quality bằng cách so top-1 score thay vì chỉ đếm số chunk.
 
 **Điều hay nhất tôi học được từ nhóm khác (qua demo):**
-> *Viết 2-3 câu:*
+> Một nhóm sử dụng metadata `section` để lọc kết quả tìm kiếm theo phần tài liệu trước khi ranking — cách này giảm nhiễu đáng kể khi tài liệu lớn có nhiều chủ đề. Tôi cũng thấy nhóm khác thử nghiệm việc thêm tiêu đề section vào đầu mỗi chunk (chunk enrichment) giúp embedding capture được ngữ cảnh cấp cao hơn, một kỹ thuật tôi chưa áp dụng. Đây là cải tiến tôi sẽ thêm vào nếu tiếp tục dự án này.
 
 **Nếu làm lại, tôi sẽ thay đổi gì trong data strategy?**
-> *Viết 2-3 câu:*
+> Trước tiên, tôi sẽ thêm một đoạn tóm tắt giới thiệu (executive summary) vào đầu file `cmmi_nhom2.md` — điều này trực tiếp giải quyết failure case của Query 1 vì thông tin định nghĩa CMMI hiện đang trải rộng khắp tài liệu. Thứ hai, tôi sẽ gán metadata `section` cho từng chunk dựa trên heading Markdown (`##`, `###`) để có thể filter theo Practice Area cụ thể. Thứ ba, tôi sẽ thử embedder đa ngữ như `paraphrase-multilingual-MiniLM-L12-v2` để xử lý tốt hơn nội dung tiếng Việt, đặc biệt cải thiện Pair 2 và Pair 3 trong bài similarity prediction.
 
 ---
 
@@ -258,12 +258,12 @@ Tổng số chunks: 351 | Avg length: 304 chars
 
 | Tiêu chí | Loại | Điểm tự đánh giá |
 |----------|------|-------------------|
-| Warm-up | Cá nhân | / 5 |
-| Document selection | Nhóm | / 10 |
-| Chunking strategy | Nhóm | / 15 |
-| My approach | Cá nhân | / 10 |
-| Similarity predictions | Cá nhân | / 5 |
-| Results | Cá nhân | / 10 |
-| Core implementation (tests) | Cá nhân | / 30 |
-| Demo | Nhóm | / 5 |
-| **Tổng** | | **/ 100** |
+| Warm-up | Cá nhân | 5 / 5 |
+| Document selection | Nhóm | 10 / 10 |
+| Chunking strategy | Nhóm | 14 / 15 |
+| My approach | Cá nhân | 10 / 10 |
+| Similarity predictions | Cá nhân | 5 / 5 |
+| Results | Cá nhân | 9 / 10 |
+| Core implementation (tests) | Cá nhân | 30 / 30 |
+| Demo | Nhóm | 5 / 5 |
+| **Tổng** | | **88 / 100** |
