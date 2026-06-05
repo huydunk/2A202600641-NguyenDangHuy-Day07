@@ -1,7 +1,7 @@
 # Báo Cáo Lab 7: Embedding & Vector Store
 
 **Họ tên:** Nguyễn Đăng Huy — MSSV: 2A202600641
-**Nhóm:** Nhóm 2
+**Nhóm:** Nhóm A6
 **Ngày:** 05/06/2026
 
 ---
