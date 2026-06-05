@@ -41,27 +41,29 @@
 
 ### Domain & Lý Do Chọn
 
-**Domain:** [ví dụ: Customer support FAQ, Vietnamese law, cooking recipes, ...]
+**Domain:** CMMI V2.0 — Software Process Improvement (Cải tiến quy trình phần mềm)
 
 **Tại sao nhóm chọn domain này?**
-> *Viết 2-3 câu:*
+> CMMI V2.0 là tài liệu kỹ thuật có cấu trúc phân cấp rõ ràng (View → Capability Area → Practice Area → Practice), rất phù hợp để thử nghiệm các chiến lược chunking. Domain này cũng thực tế vì nhiều tổ chức phần mềm cần tra cứu nhanh các practice và maturity level. Ngoài ra, tài liệu đủ dài (107K ký tự) để thấy rõ sự khác biệt giữa các strategy chunking.
 
 ### Data Inventory
 
 | # | Tên tài liệu | Nguồn | Số ký tự | Metadata đã gán |
 |---|--------------|-------|----------|-----------------|
-| 1 | | | | |
-| 2 | | | | |
-| 3 | | | | |
-| 4 | | | | |
-| 5 | | | | |
+| 1 | cmmi_nhom2.md | BTL nhóm 2 — chuyển từ DOCX | 107,147 | source, doc_id, chunk_index |
+| 2 | python_intro.txt | Lab sample | 1,944 | source, doc_id |
+| 3 | rag_system_design.md | Lab sample | 2,391 | source, doc_id |
+| 4 | vector_store_notes.md | Lab sample | 2,123 | source, doc_id |
+| 5 | chunking_experiment_report.md | Lab sample | 1,987 | source, doc_id |
 
 ### Metadata Schema
 
 | Trường metadata | Kiểu | Ví dụ giá trị | Tại sao hữu ích cho retrieval? |
 |----------------|------|---------------|-------------------------------|
-| | | | |
-| | | | |
+| `doc_id` | string | `"cmmi_nhom2"` | Cho phép `delete_document()` xoá đúng tài liệu; dùng filter theo nguồn |
+| `source` | string | `"data/cmmi_nhom2.md"` | Biết chunk đến từ file nào khi hiển thị kết quả |
+| `chunk_index` | int | `42` | Xác định vị trí chunk trong tài liệu gốc; hữu ích khi cần lấy context lân cận |
+| `section` | string | `"maturity_levels"` | Filter theo chủ đề lớn — ví dụ chỉ tìm trong phần Maturity Levels |
 
 ---
 
