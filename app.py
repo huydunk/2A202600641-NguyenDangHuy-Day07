@@ -5,10 +5,18 @@ Run: streamlit run app.py
 from __future__ import annotations
 
 import math
+import os
 import random
 from pathlib import Path
 
 import streamlit as st
+
+try:
+    import anthropic as _anthropic
+    _ANTHROPIC_AVAILABLE = bool(os.environ.get("ANTHROPIC_API_KEY"))
+except ImportError:
+    _anthropic = None  # type: ignore
+    _ANTHROPIC_AVAILABLE = False
 
 from src.chunking import (
     ChunkingStrategyComparator,
@@ -31,6 +39,61 @@ DATA_FILES = sorted(DATA_DIR.glob("*.txt")) + sorted(DATA_DIR.glob("*.md"))
 # ── helpers ───────────────────────────────────────────────────────────────────
 def euclidean(a: list[float], b: list[float]) -> float:
     return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+
+def _stream_similarity_comment(text_a: str, text_b: str, cos: float, euc: float, dim: int, embedder_name: str):
+    """Yield Claude's token-by-token commentary on a similarity result."""
+    if not _ANTHROPIC_AVAILABLE or _anthropic is None:
+        return
+    client = _anthropic.Anthropic()
+    prompt = (
+        f"You are an expert on text embeddings and RAG pipelines.\n\n"
+        f"Embedder: {embedder_name} (embedding dim: {dim})\n\n"
+        f"Text A: {text_a}\n"
+        f"Text B: {text_b}\n\n"
+        f"Computed metrics:\n"
+        f"  • Cosine Similarity : {cos:.4f}  (range −1→1, higher = more similar)\n"
+        f"  • Euclidean Distance: {euc:.4f}  (range 0→∞, lower = more similar)\n\n"
+        "In 3–5 sentences explain:\n"
+        "1. Whether these texts are semantically similar or different based on the scores.\n"
+        "2. Why the embedder gave these scores (what semantic relationship exists?).\n"
+        "3. Any interesting observation — e.g. cross-language gaps, domain term mismatch, surprising results."
+    )
+    with client.messages.stream(
+        model="claude-opus-4-8",
+        max_tokens=350,
+        messages=[{"role": "user", "content": prompt}],
+    ) as stream:
+        for text in stream.text_stream:
+            yield text
+
+
+def _stream_search_comment(query: str, results: list[dict], embedder_name: str):
+    """Yield Claude's commentary on search result quality."""
+    if not _ANTHROPIC_AVAILABLE or _anthropic is None:
+        return
+    client = _anthropic.Anthropic()
+    top_snippets = "\n".join(
+        f"  [{i+1}] score={r.get('score', 0):.4f} — {r['content'][:120].replace(chr(10), ' ')}…"
+        for i, r in enumerate(results)
+    )
+    prompt = (
+        f"You are an expert on vector search and RAG quality.\n\n"
+        f"Embedder: {embedder_name}\n"
+        f"Query: {query}\n\n"
+        f"Top retrieved chunks:\n{top_snippets}\n\n"
+        "In 3–5 sentences explain:\n"
+        "1. How well do the retrieved chunks answer the query?\n"
+        "2. What do the similarity scores tell us about retrieval quality?\n"
+        "3. Any suggestions to improve retrieval (chunking strategy, embedder choice, etc.)."
+    )
+    with client.messages.stream(
+        model="claude-opus-4-8",
+        max_tokens=350,
+        messages=[{"role": "user", "content": prompt}],
+    ) as stream:
+        for text in stream.text_stream:
+            yield text
 
 
 @st.cache_resource
@@ -223,6 +286,17 @@ with tab2:
                     with st.expander(f"#{i} — score: {score:.4f} | {source} [chunk {chunk_idx}]", expanded=True):
                         st.write(r["content"])
 
+                # Claude commentary on retrieval quality
+                st.divider()
+                st.markdown("**Claude's retrieval quality analysis**")
+                if _ANTHROPIC_AVAILABLE:
+                    with st.spinner("Claude is reviewing the results…"):
+                        st.write_stream(
+                            _stream_search_comment(query, results, embedder_choice)
+                        )
+                else:
+                    st.info("Set `ANTHROPIC_API_KEY` to enable Claude commentary.")
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 3 — Similarity Explorer
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -264,6 +338,17 @@ with tab3:
             st.warning("Moderate similarity.")
         else:
             st.error("Low similarity — texts are semantically distant.")
+
+        # Claude commentary
+        st.divider()
+        st.markdown("**Claude's analysis**")
+        if _ANTHROPIC_AVAILABLE:
+            with st.spinner("Claude is analyzing the embedder output…"):
+                st.write_stream(
+                    _stream_similarity_comment(text_a, text_b, cos, euc, len(vec_a), embedder_choice)
+                )
+        else:
+            st.info("Set `ANTHROPIC_API_KEY` in your environment to enable Claude commentary.")
 
         # Multi-pair batch
         st.divider()
