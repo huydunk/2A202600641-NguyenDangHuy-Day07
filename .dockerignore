@@ -1,0 +1,25 @@
+# NEVER copy secrets into the image
+.env
+.env.*
+!.env.example
+
+# Python cruft
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Git / local / IDE
+.git/
+.vscode/
+.idea/
+.venv/
+
+# Not needed at runtime (keeps the build context small)
+tests/
+docs/
+report/
+benchmark.py
+main.py
+*.md
+src_w_solution/
